@@ -5,11 +5,18 @@ const btnLeft = document.querySelector('#left');
 const btnRight = document.querySelector('#right');
 const btnDown = document.querySelector('#down');
 const spanLives = document.querySelector('#lives');
+const spanTime = document.querySelector('#time');
+const spanRecord = document.querySelector('#record');
+const spanResult = document.querySelector('#result');
 
 let canvasSize;
 let elementsSize;
 let level = 0;
 let lives = 3;
+
+let timeStart;
+let timePlayer;
+let timeInterval;
 
 const playerPosition = {
     x: undefined,
@@ -47,6 +54,12 @@ function startGame() {
     if (!map) {
         gameWin();
         return;
+    }
+
+    if (!timeStart) {
+        timeStart = Date.now();
+        timeInterval = setInterval(showTime, 100)
+        showRecord();
     }
 
     const mapRows = map.trim().split('\n');
@@ -89,9 +102,7 @@ function movePlayer() {
     const giftCollisionX = playerPosition.x.toFixed(3) == giftPosition.x.toFixed(3);
     const giftCollisionY = playerPosition.y.toFixed(3) == giftPosition.y.toFixed(3);
     const giftCollision = giftCollisionX && giftCollisionY;
-    
-    console.log(giftCollisionY, giftPosition.y);
-    
+
     if (giftCollision) {
         levelWin();
     }
@@ -116,20 +127,38 @@ function levelWin() {
 }
 
 function levelFail() {
-    console.log('chocaste con un enemigo');
     lives--;
-
-    if (lives <= 0) {
+    
+    if (lives < 1) {
         level = 0;
-        lives = 3
+        lives = 3;
+        timeStart = undefined;
     }
+    
     playerPosition.x = undefined;
     playerPosition.y = undefined;
+    
     startGame();
+    console.log('chocaste con un enemigo');
 }
 
 function gameWin() {
     console.log('Game Over');
+    clearInterval(timeInterval);
+
+    const recordTime = localStorage.getItem('record_time');
+    const playerTime = Date.now() - timeStart;
+
+    if (recordTime) {
+        if (recordTime >= playerTime) {
+            localStorage.setItem('record_time', playerTime);
+            spanResult.innerHTML = 'SUPERASTE EL RECORD :)';
+        } else {
+            spanResult.innerHTML = 'Lo siento no superaste el record'
+        }
+    } else {
+        localStorage.setItem('record_time', playerTime);
+    }
 }
 
 function showLives() {
@@ -137,6 +166,14 @@ function showLives() {
 
     spanLives.innerHTML = "";
     heartsArray.forEach(heart => spanLives.append(heart))
+}
+
+function showTime() {
+    spanTime.innerHTML = Date.now() - timeStart;
+}
+
+function showRecord() {
+    spanRecord.innerHTML = localStorage.getItem('record_time')
 }
 
 window.addEventListener('keydown', moveByKeys)
