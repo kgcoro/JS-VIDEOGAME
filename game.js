@@ -33,20 +33,24 @@ window.addEventListener('resize', setCanvasSize);
 
 function setCanvasSize() {
     (window.innerHeight > window.innerWidth) ?
-        canvasSize = window.innerWidth * 0.8 :
-        canvasSize = window.innerHeight * 0.8
+        canvasSize = window.innerWidth * 0.7 :
+        canvasSize = window.innerHeight * 0.7
 
+    canvasSize = Number(canvasSize.toFixed(0));
+    
     canvas.setAttribute('width', canvasSize);
     canvas.setAttribute('height', canvasSize);
 
     elementsSize = (canvasSize / 10);
-
+    
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
     startGame();
 }
 
 function startGame() {
 
-    game.font = (elementsSize - 6) + 'px Verdana';
+    game.font = (elementsSize - 9) + 'px Verdana';
     game.textAlign = 'end';
 
     const map = maps[level];
@@ -133,6 +137,7 @@ function levelFail() {
         level = 0;
         lives = 3;
         timeStart = undefined;
+        clearInterval(timeInterval)
     }
     
     playerPosition.x = undefined;
